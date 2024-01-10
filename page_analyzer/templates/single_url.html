@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<body class="min-vh-100 d-flex flex-column">
+  <main class="flex-grow-1">
+    <div class="container-lg mt-3">
+      <h1>Сайт: {{ name }} </h1>
+      <div>
+        <table class="table table-bordered table-hover text-nowrap" data-test="url">
+          <tbody>
+            <tr>
+              <td>ID</td>
+              <td>{{ id }}</td>
+            </tr>
+            <tr>
+              <td>Имя</td>
+              <td>{{ name }}</td>
+            </tr>
+            <tr>
+              <td>Дата создания</td>
+              <td>{{ created_at.date() }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>
