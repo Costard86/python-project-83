@@ -15,8 +15,10 @@ selfcheck:
 
 check: selfcheck test lint
 
-build: check
-	poetry build
+# build: check
+# 	poetry build
+build:
+	./build.sh
 
 .PHONY: install test lint selfcheck check build
 
