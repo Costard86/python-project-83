@@ -3,6 +3,7 @@ from flask import Flask, flash, redirect, render_template, request, url_for, abo
 from dotenv import load_dotenv
 from .validate_urls import normalize, validate
 from .database import get_urls, add_to_urls, get_url_by_name, get_url_by_id, connection
+import psycopg2
 
 
 load_dotenv()
@@ -13,6 +14,8 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET', 'secret_key')
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 SELECT_URL = 'SELECT * FROM urls WHERE name = %s;'
+
+conn = psycopg2.connect(DATABASE_URL)
 
 
 @app.errorhandler(404)
