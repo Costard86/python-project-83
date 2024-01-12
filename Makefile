@@ -19,7 +19,7 @@ build:
 	poetry build
 
 setup:
-	make build
+	make install
 	sh ./build.sh
 
 .PHONY: install test lint selfcheck check build
