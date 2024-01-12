@@ -1,5 +1,9 @@
 install:
-	poetry install && psql -a -d $DATABASE_URL -f database.sql
+	poetry install
+
+setup:
+	make install
+	sh ./build.sh
 
 test:
 	poetry run pytest
