@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS public.urls
     name character varying(255) COLLATE pg_catalog."default" NOT NULL,
     created_at timestamp without time zone NOT NULL DEFAULT now(),
     CONSTRAINT urls_pkey PRIMARY KEY (id)
-)
+);
 
 CREATE TABLE url_checks(
     id serial PRIMARY KEY,
