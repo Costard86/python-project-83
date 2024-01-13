@@ -3,8 +3,6 @@ from flask import Flask, flash, redirect, render_template, request, url_for, abo
 from dotenv import load_dotenv
 from .validate_urls import normalize, validate
 from .database import get_urls, add_to_urls, get_url_by_name, get_url_by_id, connection, add_to_url_checks, get_url_checks
-import requests
-from requests.exceptions import RequestException
 
 
 load_dotenv()
