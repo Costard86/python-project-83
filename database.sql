@@ -5,3 +5,13 @@ CREATE TABLE IF NOT EXISTS public.urls
     created_at timestamp without time zone NOT NULL DEFAULT now(),
     CONSTRAINT urls_pkey PRIMARY KEY (id)
 )
+
+CREATE TABLE url_checks(
+    id serial PRIMARY KEY,
+    url_id int REFERENCES urls (id) ON DELETE CASCADE,
+    status_code int,
+    h1 varchar(255),
+    title varchar(255),
+    description text,
+    created_at timestamp
+);

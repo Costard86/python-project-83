@@ -2,7 +2,9 @@ import os
 from flask import Flask, flash, redirect, render_template, request, url_for, abort
 from dotenv import load_dotenv
 from .validate_urls import normalize, validate
-from .database import get_urls, add_to_urls, get_url_by_name, get_url_by_id, connection
+from .database import get_urls, add_to_urls, get_url_by_name, get_url_by_id, connection, add_to_url_checks, get_url_checks
+import requests
+from requests.exceptions import RequestException
 
 
 load_dotenv()
@@ -71,4 +73,27 @@ def show_url(id):
             abort(404)
     return render_template('single_url.html', id=found_url.id,
                            name=found_url.name, created_at=found_url.created_at)
+
+
+@app.post('/urls/<int:id>/checks')
+def add_url_check(id):
+    with connection(DATABASE_URL) as conn:
+        # Дополнительная проверка существования сайта
+        found_url = get_url_by_id(conn, id)
+        if not found_url:
+            abort(404)
+
+        url_id = found_url.id
+        status_code = 200
+        h1 = "H1"
+        title = "Title"
+        description = "Description"
+
+        add_to_url_checks(conn, url_id, status_code, h1, title, description)
+        flash('Проверка успешно добавлена', 'success')
+
+        url_checks = get_url_checks(conn, url_id)
+
+    return render_template('single_url.html', id=found_url.id, name=found_url.name, created_at=found_url.created_at, url_checks=url_checks)
+
 
