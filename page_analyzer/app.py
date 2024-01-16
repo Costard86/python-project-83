@@ -81,6 +81,7 @@ def add_url_check(id):
     with connection(DATABASE_URL) as conn:
         # Дополнительная проверка существования сайта
         found_url = get_url_by_id(conn, id)
+        status_code = -1
         if not found_url:
             abort(404)
         try:
