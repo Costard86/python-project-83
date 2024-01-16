@@ -33,6 +33,7 @@
             <tr>
               <th>ID</th>
               <th>Дата создания</th>
+              <th>Код ответа</th>
             </tr>
           </thead>
           <tbody>
@@ -40,6 +41,7 @@
             <tr>
               <td>{{ check_id }}</td>
               <td>{{ created_at.date() }}</td>
+              <td>{{ status_code }}</td>
             </tr>
             {% endfor %}
           </tbody>

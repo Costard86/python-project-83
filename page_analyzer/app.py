@@ -3,6 +3,9 @@ from flask import Flask, flash, redirect, render_template, request, url_for, abo
 from dotenv import load_dotenv
 from .validate_urls import normalize, validate
 from .database import get_urls, add_to_urls, get_url_by_name, get_url_by_id, connection, add_to_url_checks, get_url_checks
+import requests
+from requests.exceptions import RequestException
+import logging
 
 
 load_dotenv()
@@ -80,18 +83,34 @@ def add_url_check(id):
         found_url = get_url_by_id(conn, id)
         if not found_url:
             abort(404)
+        try:
+            response = requests.get(found_url.name)
+            response.raise_for_status()
 
-        url_id = found_url.id
-        status_code = 200
-        h1 = "H1"
-        title = "Title"
-        description = "Description"
+            # Ваш код обработки ответа
+            status_code = response.status_code
+            h1 = ""  # Ваш код для извлечения H1 заголовка
+            title = ""  # Ваш код для извлечения заголовка
+            description = ""  # Ваш код для извлечения описания
 
-        add_to_url_checks(conn, url_id, status_code, h1, title, description)
-        flash('Проверка успешно добавлена', 'success')
+            add_to_url_checks(
+                conn,
+                found_url.id,
+                status_code,
+                h1,
+                title,
+                description
+            )
 
-        url_checks = get_url_checks(conn, url_id)
+            flash('Проверка успешно добавлена', 'success')
 
-    return render_template('single_url.html', id=found_url.id, name=found_url.name, created_at=found_url.created_at, url_checks=url_checks)
+        except RequestException as error:
+            logging.error(f"Impossible to check {found_url.name}\n{error}")
+            flash('Произошла ошибка при проверке', 'error')
+
+        url_checks = get_url_checks(conn, found_url.id)
+
+    return render_template('single_url.html', status_code=status_code, id=found_url.id,
+                           name=found_url.name, created_at=found_url.created_at, url_checks=url_checks)
 
 
