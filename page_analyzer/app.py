@@ -2,10 +2,12 @@ import os
 from flask import Flask, flash, redirect, render_template, request, url_for, abort
 from dotenv import load_dotenv
 from .validate_urls import normalize, validate
-from .database import get_urls, add_to_urls, get_url_by_name, get_url_by_id, connection, add_to_url_checks, get_url_checks
+from .database import (get_urls, add_to_urls, get_url_by_name, get_url_by_id,
+                       connection, add_to_url_checks, get_url_checks)
 import requests
 from requests.exceptions import RequestException
 import logging
+from .content_html import get_content
 
 
 load_dotenv()
@@ -48,12 +50,12 @@ def add_url():
     with connection(DATABASE_URL) as conn:
         found_url = get_url_by_name(conn, normalized_url)
         if found_url:
-            id = found_url.id
+            id_found = found_url.id
             flash('Страница уже существует', 'success')
         else:
-            id = add_to_urls(conn, normalized_url)
+            id_found = add_to_urls(conn, normalized_url)
             flash('Страница успешно добавлена', 'success')
-    return redirect(url_for('show_url', id=id))
+    return redirect(url_for('show_url', id=id_found))
 
 
 # all urls - GET
@@ -68,7 +70,6 @@ def show_urls():
 @app.get('/urls/<int:id>')
 def show_url(id):
     with connection(DATABASE_URL) as conn:
-        # ID is pulled out of DB
         found_url = get_url_by_id(conn, id)
         if not found_url:
             abort(404)
@@ -79,29 +80,22 @@ def show_url(id):
 @app.post('/urls/<int:id>/checks')
 def add_url_check(id):
     with connection(DATABASE_URL) as conn:
-        # Дополнительная проверка существования сайта
         found_url = get_url_by_id(conn, id)
         status_code = -1
+        h1 = ""
+        title = ""
+        description = ""
         if not found_url:
             abort(404)
         try:
             response = requests.get(found_url.name)
             response.raise_for_status()
 
-            # Ваш код обработки ответа
             status_code = response.status_code
-            h1 = ""  # Ваш код для извлечения H1 заголовка
-            title = ""  # Ваш код для извлечения заголовка
-            description = ""  # Ваш код для извлечения описания
 
-            add_to_url_checks(
-                conn,
-                found_url.id,
-                status_code,
-                h1,
-                title,
-                description
-            )
+            h1, title, description = get_content(response.text)
+
+            add_to_url_checks(conn, found_url.id, status_code, h1, title, description)
 
             flash('Проверка успешно добавлена', 'success')
 
@@ -112,6 +106,5 @@ def add_url_check(id):
         url_checks = get_url_checks(conn, found_url.id)
 
     return render_template('single_url.html', status_code=status_code, id=found_url.id,
-                           name=found_url.name, created_at=found_url.created_at, url_checks=url_checks)
-
-
+                           name=found_url.name, created_at=found_url.created_at, url_checks=url_checks,
+                           h1=h1, title=title, description=description)

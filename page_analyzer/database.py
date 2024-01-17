@@ -40,6 +40,7 @@ WHERE url_id = %s
 ORDER BY created_at DESC;
 """
 
+
 @contextlib.contextmanager
 def connection(db_url):
     conn = psycopg2.connect(db_url)
@@ -97,4 +98,3 @@ def get_url_checks(conn, url_id):
         curs.execute(SELECT_URL_CHECKS, (url_id,))
         url_checks = curs.fetchall()
     return url_checks
-
