@@ -39,7 +39,6 @@ def index():
 # main page - POST
 @app.post('/urls')
 def add_url():
-    # check if the url from the form is correct
     url = request.form.get('url')
     normalized_url = normalize(url)
     error = validate(normalized_url)
